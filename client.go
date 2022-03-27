@@ -10,14 +10,14 @@ import (
 )
 
 type client struct {
-	conn net.Conn
-	name string
-	room *room
+	conn     net.Conn
+	name     string
+	room     *room
 	commands chan<- command
 }
 
 // parse incoming message string
-func (c *client) readMessage() {
+func (c *client) parseMessage() {
 	for {
 		msg, err := bufio.NewReader(c.conn).ReadString('\n')
 		if err != nil {
@@ -74,7 +74,7 @@ func (c *client) readMessage() {
 func (c *client) err(err error) {
 	_, err = c.conn.Write([]byte("Error: " + err.Error() + "\n"))
 	if err != nil {
-		return 
+		return
 	}
 }
 
@@ -83,8 +83,9 @@ func (c *client) err(err error) {
 func (c *client) msg(msg string) {
 	t := time.Now()
 
+	// output the timestamp and message string
 	_, err := c.conn.Write([]byte(fmt.Sprintf(t.Format("15:04:05")) + ":" + msg + "\n"))
 	if err != nil {
-		return 
+		return
 	}
 }

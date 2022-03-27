@@ -10,19 +10,20 @@ import (
 )
 
 type server struct {
-	rooms map[string]*room
+	rooms    map[string]*room
 	commands chan command
 }
 
 // initialize server
 func initServer() *server {
 	return &server{
-		rooms: make(map[string]*room),
+		rooms:    make(map[string]*room),
 		commands: make(chan command),
 	}
 }
 
-// parse incoming commands
+// find incoming command
+// then run
 func (s *server) run() {
 	for cmd := range s.commands {
 		switch cmd.id {
@@ -39,18 +40,21 @@ func (s *server) run() {
 		}
 	}
 }
+
+// initialize client
 func (s *server) initClient(conn net.Conn) {
 	log.Printf("client successfully initialized and connected: %s", conn.RemoteAddr().String())
 
+	// create random default username
 	var newUser = fmt.Sprintf("Anonymous%d", rand.Intn(1000))
 
 	c := client{
-		conn: conn,
-		name: newUser,
+		conn:     conn,
+		name:     newUser,
 		commands: s.commands,
 	}
 
-	c.readMessage()
+	c.parseMessage()
 }
 
 // change username
@@ -60,14 +64,14 @@ func (s *server) name(c *client, args []string) {
 }
 
 // join a room
-// create if non exists
+// create if none exists
 func (s *server) join(c *client, args []string) {
 	roomName := args[1]
 	// check first if room exists
 	r, ok := s.rooms[roomName]
 	if !ok {
 		r = &room{
-			name: roomName,
+			name:    roomName,
 			members: make(map[net.Addr]*client),
 		}
 		s.rooms[roomName] = r
@@ -95,21 +99,22 @@ func (s *server) listRooms(c *client, args []string) {
 
 // delete the client
 // from room members
-func (s *server) exitRoom (c *client) {
+func (s *server) exitRoom(c *client) {
 	if c.room != nil {
 		delete(c.room.members, c.conn.RemoteAddr())
 		c.room.announce(c, fmt.Sprintf("%s has left the room", c.name))
 	}
 }
 
-// sends a message to all clients
+// sends a message
+// to all clients
 func (s *server) all(c *client, args []string) {
 	if c.room == nil {
 		c.err(errors.New("you must join a room to send a message"))
 		return
 	}
 
-	c.room.announce(c, c.name + ": " + strings.Join(args[1:len(args)], " "))
+	c.room.announce(c, c.name+": "+strings.Join(args[1:len(args)], " "))
 }
 
 // ends the connection
@@ -121,6 +126,6 @@ func (s *server) exit(c *client, args []string) {
 	c.msg("Session ended")
 	err := c.conn.Close()
 	if err != nil {
-		return 
+		return
 	}
 }
