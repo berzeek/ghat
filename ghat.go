@@ -9,9 +9,9 @@ import (
 )
 
 type Config struct {
-	Server struct{
+	Server struct {
 		IpAddress string `json:"IpAddress"`
-		Port string `json:"Port"`
+		Port      string `json:"Port"`
 	} `json:"Server"`
 	LogFile string `json:"LogFile"`
 }
@@ -28,19 +28,24 @@ func LoadConfiguration(filename string) (Config, error) {
 	return config, err
 }
 
-func main()  {
+func main() {
 	colorGreen := "\033[32m"
 	fmt.Println(string(colorGreen), "Starting Ghat application...")
 
 	// retrieve configuration values
 	config, _ := LoadConfiguration("config.json")
 
-	// run the server routine
+	// run the chat server routine
 	s := initServer()
 	go s.run()
 
+	// start api server
+	go func() {
+		handleRequests()
+	}()
+
 	// bind network address
-	listener, err := net.Listen("tcp", config.Server.IpAddress + ":" + config.Server.Port)
+	listener, err := net.Listen("tcp", config.Server.IpAddress+":"+config.Server.Port)
 	if err != nil {
 		log.Fatalf("server failed to start: %s", err.Error())
 	}

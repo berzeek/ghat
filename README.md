@@ -2,26 +2,29 @@
 
 ## Goal
 Build a Go chat server with the following features:
-- Multiple clients can connect via telnet and can send messages to the server
-- When a message is relayed to the server it should relay the following into to all connected clients:
-    - timestamp
-    - name of client
-- All messages should be logged to a local log file
-- Read the following configuration settings from a local config file:
-    - listening port
-    - IP
-    - log file location
+- [ ] Multiple clients can connect via telnet and can send messages to the server
+- [ ] When a message is relayed to the server it should relay the following into to all connected clients:
+  - [ ] timestamp
+  - [ ] name of client
+- [ ] All messages should be logged to a local log file
+- [ ] Read the following configuration settings from a local config file:
+  - [ ] listening port
+    - [ ] IP
+    - [ ] log file location
 
 ### Optional Features
-- HTTP rest api to post messages.
-- HTTP rest api to query messages.
-- Segment rooms / channels.
-- Add ignore option.
+- [ ] HTTP rest api to post messages.
+- [ ] HTTP rest api to query messages.
+- [ ] Segment rooms / channels.
+- [ ] Add ignore option.
 
 ### Run the app
 - `go build .` - build application.
 - `./ghat` - start the server.
 - `telnet localhost 8888` - connect the client (do the same in another terminal to see other users messages)
+
+### API
+- request `http://localhost:10000/messages` for a simple api endpoint to view the message log.
 
 ### Commands
 - `/name <name>` - create a username for the user.
